@@ -115,7 +115,7 @@ func (cc Conn) QueryRow(ctx context.Context, key string, v interface{}, query Qu
 			fmt.Println("mysql:",v, e)
 			if e != nil {
 				if e == cc.errNotFound {
-					_ = cc.setCacheWithExpire(ctx, key, notFoundPlaceholder, defaultNotFoundExpiry)
+					_ = cc.setCacheWithExpire(ctx, key, notFoundPlaceholder, cc.notFoundExpiry)
 					return nil, cc.errNotFound
 				}
 				return nil, e
