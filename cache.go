@@ -115,18 +115,15 @@ func (cc Conn) QueryRow(ctx context.Context, key string, v interface{}, query Qu
 			fmt.Println("mysql:",v, e)
 			if e != nil {
 				if e == cc.errNotFound {
-					cc.setCacheWithExpire(ctx, key, notFoundPlaceholder, defaultNotFoundExpiry)
+					_ = cc.setCacheWithExpire(ctx, key, notFoundPlaceholder, defaultNotFoundExpiry)
 					return nil, cc.errNotFound
 				}
 				return nil, e
 			}
 
 			s, _ := json.Marshal(v)
-			cc.setCache(ctx, key, s)
-			// 可以改为fanout模式，减少延时
-			//dao.cache.Do(ctx, func(ctx context.Context) {
-			//	_ = dao.cacheSetMember(ctx, id, miss)
-			//})
+			_ = cc.setCache(ctx, key, s)
+
 		}
 
 		return json.Marshal(v)
@@ -168,16 +165,16 @@ func (cc Conn) QueryRow(ctx context.Context, key string, v interface{}, query Qu
 //	})
 //}
 //
-
-func floatKeyer(fn func(interface{}) string) func(interface{}) string {
-	return func(primary interface{}) string {
-		switch v := primary.(type) {
-		case float32:
-			return fn(int64(v))
-		case float64:
-			return fn(int64(v))
-		default:
-			return fn(primary)
-		}
-	}
-}
+//
+//func floatKeyer(fn func(interface{}) string) func(interface{}) string {
+//	return func(primary interface{}) string {
+//		switch v := primary.(type) {
+//		case float32:
+//			return fn(int64(v))
+//		case float64:
+//			return fn(int64(v))
+//		default:
+//			return fn(primary)
+//		}
+//	}
+//}

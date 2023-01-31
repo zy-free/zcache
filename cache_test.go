@@ -50,7 +50,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	db, err := dbConnect("root:root@tcp(127.0.0.1:3306)/kartos_member?timeout=5s&readTimeout=5s&writeTimeout=5s&parseTime=true&loc=Local&charset=utf8,utf8mb4")
+	db, err := dbConnect("root:@tcp(127.0.0.1:3306)/test?timeout=5s&readTimeout=5s&writeTimeout=5s&parseTime=true&loc=Local&charset=utf8mb4")
 	if err != nil {
 		panic(err)
 	}
@@ -79,6 +79,7 @@ func Test_Cache_QueryRow(t *testing.T) {
 		ID   int64
 		Phone string
 		Name string
+		Address string
 	}
 	var (
 		err error
@@ -94,7 +95,7 @@ func Test_Cache_QueryRow(t *testing.T) {
 			defer wg.Done()
 			m := member{}
 			err = cache.QueryRow(context.TODO(), memberIdKey, &m, func(conn *sql.DB) error {
-				query := `select id,phone,name from member where id = ? limit 1`
+				query := `select id,phone,name,address from member where id = ? limit 1`
 				return conn.QueryRow(query, id).Scan(&m.ID,&m.Phone, &m.Name)
 			})
 			fmt.Println(m, err)
